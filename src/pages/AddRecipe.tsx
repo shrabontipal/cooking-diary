@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ArrowLeft, Image, Mic, Video, MessageSquare } from 'lucide-react'
+import { ArrowLeft, Mic, Video, MessageSquare } from 'lucide-react'
 
 import { Button } from '../components/ui/button'
 import {
@@ -16,7 +16,7 @@ import {
 } from '../components/ui/form'
 import { Input } from '../components/ui/input'
 import { Textarea } from '../components/ui/textarea'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../components/ui/card'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
 import { useToast } from '../components/ui/use-toast'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs'
 
@@ -28,8 +28,8 @@ const formSchema = z.object({
   title: z.string().min(3, { message: 'Title must be at least 3 characters long' }),
   description: z.string().min(10, { message: 'Description must be at least 10 characters long' }),
   source: z.string().optional(),
-  tags: z.string().transform(val => val.split(',').map(tag => tag.trim())),
-  imageUrl: z.string().url({ message: 'Please enter a valid image URL' }).optional(),
+  tags: z.string().transform(val => val.split(',').map((tag: string) => tag.trim())),
+  imageUrl: z.string().url({ message: 'Please enter a valid image URL' }).optional().or(z.literal('')),
   mediaType: z.enum(['text', 'audio', 'video']).default('text'),
   mediaContent: z.any().optional(),
   instructions: z.string().optional(),
@@ -39,7 +39,6 @@ const formSchema = z.object({
   servings: z.string().transform(val => (val ? parseInt(val, 10) : undefined)).optional(),
 });
 
-type FormData = z.infer<typeof formSchema>;
 
 const AddRecipe = () => {
   const navigate = useNavigate();
@@ -48,7 +47,7 @@ const AddRecipe = () => {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [mediaFile, setMediaFile] = useState<File | null>(null);
   
-  const form = useForm<FormData>({
+  const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: '',
@@ -94,12 +93,12 @@ const AddRecipe = () => {
     }
   };
 
-  const saveRecipe = (data: FormData) => {
+  const saveRecipe = (data: z.infer<typeof formSchema>) => {
     const storedRecipes = localStorage.getItem('recipes');
     const recipes = storedRecipes ? JSON.parse(storedRecipes) : [];
     
     const formattedTags = Array.isArray(data.tags) ? data.tags : 
-      data.tags.split(',').map(tag => tag.trim());
+      typeof data.tags === 'string' ? data.tags.split(',').map((tag: string) => tag.trim()) : [];
     
     const newRecipe = {
       id: generateId(),
@@ -112,7 +111,7 @@ const AddRecipe = () => {
       ingredients: data.ingredients ? data.ingredients.split('\n') : [],
       prepTime: data.prepTime,
       cookTime: data.cookTime,
-      servings: data.servings ? parseInt(data.servings.toString(), 10) : undefined,
+      servings: data.servings,
       mediaType: data.mediaType,
       mediaUrl: data.mediaContent
     };
@@ -123,7 +122,7 @@ const AddRecipe = () => {
     return newRecipe;
   };
 
-  const onSubmit = (data: FormData) => {
+  const onSubmit = (data: z.infer<typeof formSchema>) => {
     try {
       const newRecipe = saveRecipe(data);
       
