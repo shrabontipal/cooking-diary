@@ -65,11 +65,13 @@ function App() {
       <div className="min-h-screen bg-pink-50">
         <Header />
         
-        <Routes>
-          <Route path="/" element={<Home recipes={popularRecipes} />} />
-          <Route path="/register" element={<Registration />} />
-          <Route path="/login" element={<Login />} />
-        </Routes>
+        <div className="pt-24"> {/* Added padding-top to account for fixed header */}
+          <Routes>
+            <Route path="/" element={<Home recipes={popularRecipes} />} />
+            <Route path="/register" element={<Registration />} />
+            <Route path="/login" element={<Login />} />
+          </Routes>
+        </div>
         
         <Footer />
         <Toaster />
