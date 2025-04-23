@@ -2,9 +2,11 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import './App.css'
 import Header from './components/layout/Header'
 import Footer from './components/layout/Footer'
-import Registration from './pages/Registration'
 import Home from './pages/Home'
+import Registration from './pages/Registration'
+import Login from './pages/Login'
 import { Recipe } from './types'
+import { Toaster } from './components/ui/toaster'
 
 const popularRecipes: Recipe[] = [
   {
@@ -66,10 +68,11 @@ function App() {
         <Routes>
           <Route path="/" element={<Home recipes={popularRecipes} />} />
           <Route path="/register" element={<Registration />} />
-          <Route path="/login" element={<div className="container mx-auto px-4 py-12 text-center">Login page coming soon</div>} />
+          <Route path="/login" element={<Login />} />
         </Routes>
         
         <Footer />
+        <Toaster />
       </div>
     </Router>
   )
