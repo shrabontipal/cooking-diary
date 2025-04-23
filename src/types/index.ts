@@ -10,4 +10,6 @@ export interface Recipe {
   prepTime?: string;
   cookTime?: string;
   servings?: number;
+  mediaType?: 'text' | 'audio' | 'video';
+  mediaUrl?: string;
 }

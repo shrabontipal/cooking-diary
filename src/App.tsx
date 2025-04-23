@@ -5,6 +5,7 @@ import Footer from './components/layout/Footer'
 import Home from './pages/Home'
 import Registration from './pages/Registration'
 import Login from './pages/Login'
+import AddRecipe from './pages/AddRecipe'
 import { Recipe } from './types'
 import { Toaster } from './components/ui/toaster'
 
@@ -70,6 +71,7 @@ function App() {
             <Route path="/" element={<Home recipes={popularRecipes} />} />
             <Route path="/register" element={<Registration />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/add-recipe" element={<AddRecipe />} />
           </Routes>
         </div>
         

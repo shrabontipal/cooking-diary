@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs'
 import { Input } from '../components/ui/input'
 import { Search, Plus } from 'lucide-react'
@@ -11,14 +12,57 @@ interface HomeProps {
   recipes: Recipe[];
 }
 
-const Home = ({ recipes }: HomeProps) => {
+const Home = ({ recipes: initialRecipes }: HomeProps) => {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
+  const [recipes, setRecipes] = useState<Recipe[]>(initialRecipes);
+  const [activeTab, setActiveTab] = useState('popular');
+  const [userRecipes, setUserRecipes] = useState<Recipe[]>([]);
+  const [favoriteRecipes, setFavoriteRecipes] = useState<Recipe[]>([]);
   
-  const filteredRecipes = recipes.filter(recipe => 
-    recipe.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    recipe.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    recipe.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
+  useEffect(() => {
+    try {
+      const storedRecipes = localStorage.getItem('recipes');
+      if (storedRecipes) {
+        const parsedRecipes = JSON.parse(storedRecipes);
+        setUserRecipes(parsedRecipes);
+        setRecipes([...initialRecipes, ...parsedRecipes]);
+      }
+      
+      const storedFavorites = localStorage.getItem('favoriteRecipes');
+      if (storedFavorites) {
+        setFavoriteRecipes(JSON.parse(storedFavorites));
+      }
+    } catch (error) {
+      console.error('Error loading recipes from localStorage:', error);
+    }
+  }, [initialRecipes]);
+  
+  const getFilteredRecipes = () => {
+    let filteredList = [];
+    
+    switch (activeTab) {
+      case 'popular':
+        filteredList = initialRecipes;
+        break;
+      case 'my-recipes':
+        filteredList = userRecipes;
+        break;
+      case 'favorites':
+        filteredList = favoriteRecipes;
+        break;
+      default:
+        filteredList = recipes;
+    }
+    
+    return filteredList.filter(recipe => 
+      recipe.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      recipe.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      recipe.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
+    );
+  };
+  
+  const filteredRecipes = getFilteredRecipes();
 
   return (
     <main className="container mx-auto px-4 py-8">
@@ -39,7 +83,11 @@ const Home = ({ recipes }: HomeProps) => {
       </div>
 
       {/* Tabs */}
-      <Tabs defaultValue="popular" className="mb-8">
+      <Tabs 
+        value={activeTab} 
+        onValueChange={(value) => setActiveTab(value)} 
+        className="mb-8"
+      >
         <TabsList className="mb-4 bg-purple-100">
           <TabsTrigger value="popular" className="data-[state=active]:bg-pink-200 data-[state=active]:text-pink-700">Popular Recipes</TabsTrigger>
           <TabsTrigger value="my-recipes" className="data-[state=active]:bg-pink-200 data-[state=active]:text-pink-700">My Recipes</TabsTrigger>
@@ -59,28 +107,54 @@ const Home = ({ recipes }: HomeProps) => {
         </TabsContent>
         
         <TabsContent value="my-recipes">
-          <div className="text-center py-12">
-            <h3 className="text-xl font-medium text-gray-700">You haven't added any recipes yet</h3>
-            <p className="text-gray-500 mt-2 mb-6">Start building your collection by adding your favorite recipes</p>
-            <Button>
-              <Plus className="mr-2 h-4 w-4" /> Add Your First Recipe
-            </Button>
-          </div>
+          {userRecipes.length > 0 ? (
+            <>
+              <h2 className="text-2xl font-semibold text-purple-800" style={{ fontFamily: "'Montserrat', sans-serif" }}>My Recipes</h2>
+              <p className="text-purple-600 mb-4" style={{ fontFamily: "'Quicksand', sans-serif" }}>Your personal collection of recipes</p>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredRecipes.map(recipe => (
+                  <RecipeCard key={recipe.id} recipe={recipe} />
+                ))}
+              </div>
+            </>
+          ) : (
+            <div className="text-center py-12">
+              <h3 className="text-xl font-medium text-gray-700">You haven't added any recipes yet</h3>
+              <p className="text-gray-500 mt-2 mb-6">Start building your collection by adding your favorite recipes</p>
+              <Button onClick={() => navigate('/add-recipe')}>
+                <Plus className="mr-2 h-4 w-4" /> Add Your First Recipe
+              </Button>
+            </div>
+          )}
         </TabsContent>
         
         <TabsContent value="favorites">
-          <div className="text-center py-12">
-            <h3 className="text-xl font-medium text-gray-700">No favorite recipes yet</h3>
-            <p className="text-gray-500 mt-2 mb-6">Browse popular recipes and mark your favorites</p>
-            <Button variant="outline">Browse Popular Recipes</Button>
-          </div>
+          {favoriteRecipes.length > 0 ? (
+            <>
+              <h2 className="text-2xl font-semibold text-purple-800" style={{ fontFamily: "'Montserrat', sans-serif" }}>Favorite Recipes</h2>
+              <p className="text-purple-600 mb-4" style={{ fontFamily: "'Quicksand', sans-serif" }}>Your saved favorite recipes</p>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredRecipes.map(recipe => (
+                  <RecipeCard key={recipe.id} recipe={recipe} />
+                ))}
+              </div>
+            </>
+          ) : (
+            <div className="text-center py-12">
+              <h3 className="text-xl font-medium text-gray-700">No favorite recipes yet</h3>
+              <p className="text-gray-500 mt-2 mb-6">Browse popular recipes and mark your favorites</p>
+              <Button variant="outline" onClick={() => setActiveTab('popular')}>Browse Popular Recipes</Button>
+            </div>
+          )}
         </TabsContent>
         
         <TabsContent value="shared">
           <div className="text-center py-12">
             <h3 className="text-xl font-medium text-gray-700">No shared recipes yet</h3>
             <p className="text-gray-500 mt-2 mb-6">Share your recipes with friends and family</p>
-            <Button variant="outline">Browse Your Recipes</Button>
+            <Button variant="outline" onClick={() => setActiveTab('my-recipes')}>Browse Your Recipes</Button>
           </div>
         </TabsContent>
       </Tabs>
