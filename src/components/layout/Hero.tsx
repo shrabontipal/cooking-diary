@@ -9,7 +9,7 @@ const Hero = () => {
         <p className="text-lg text-purple-600 mb-6" style={{ fontFamily: "'Quicksand', sans-serif" }}>
           Save, organize, and share your favorite recipes. Add recipes as text, voice recordings, or videos.
         </p>
-        <div className="flex space-x-4">
+        <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4">
           <Button className="bg-pink-500 hover:bg-pink-600">
             <Plus className="mr-2 h-4 w-4" /> Add New Recipe
           </Button>

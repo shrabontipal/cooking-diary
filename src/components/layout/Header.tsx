@@ -31,8 +31,7 @@ const Header = () => {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-4">
             <Button 
-              variant="outline" 
-              className="text-white border-white hover:bg-pink-300/30"
+              className="bg-white text-pink-500 hover:bg-gray-100"
               onClick={() => navigate('/login')}
             >
               Sign In
@@ -61,9 +60,9 @@ const Header = () => {
         {mobileMenuOpen && (
           <div className="md:hidden py-4 bg-gradient-to-r from-pink-300 to-purple-300 border-t border-white/20 animate-in slide-in-from-top">
             <div className="flex flex-col space-y-3">
+              {/* Authentication Buttons */}
               <Button 
-                variant="outline" 
-                className="w-full text-white border-white hover:bg-pink-300/30"
+                className="w-full bg-white text-pink-500 hover:bg-gray-100"
                 onClick={() => {
                   navigate('/login');
                   setMobileMenuOpen(false);
@@ -80,6 +79,53 @@ const Header = () => {
               >
                 Create Account
               </Button>
+              
+              {/* Recipe Category Tabs */}
+              <div className="mt-4 pt-4 border-t border-white/20">
+                <h3 className="text-white font-medium mb-2 px-2">Recipe Categories</h3>
+                <div className="flex flex-col space-y-2">
+                  <Button 
+                    variant="ghost" 
+                    className="justify-start text-white hover:bg-pink-300/30"
+                    onClick={() => {
+                      navigate('/');
+                      setMobileMenuOpen(false);
+                    }}
+                  >
+                    Popular Recipes
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    className="justify-start text-white hover:bg-pink-300/30"
+                    onClick={() => {
+                      navigate('/');
+                      setMobileMenuOpen(false);
+                    }}
+                  >
+                    My Recipes
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    className="justify-start text-white hover:bg-pink-300/30"
+                    onClick={() => {
+                      navigate('/');
+                      setMobileMenuOpen(false);
+                    }}
+                  >
+                    Favorites
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    className="justify-start text-white hover:bg-pink-300/30"
+                    onClick={() => {
+                      navigate('/');
+                      setMobileMenuOpen(false);
+                    }}
+                  >
+                    Shared
+                  </Button>
+                </div>
+              </div>
             </div>
           </div>
         )}
